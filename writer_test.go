@@ -4,6 +4,7 @@
 package iostream
 
 import (
+	"bytes"
 	"fmt"
 	"testing"
 	"time"
@@ -173,6 +174,12 @@ func TestWriteFailuresString(t *testing.T) {
 	assertWriteN(t, "bytes-err", func(w *Writer) error {
 		return w.WriteBytes([]byte("hello"))
 	}, nil, 0)
+}
+
+func TestWriteMethod(t *testing.T) {
+	w := NewWriter(bytes.NewBuffer(nil))
+	_, err := w.Write(nil)
+	assert.NoError(t, err)
 }
 
 // assertWrite asserts a single write operation

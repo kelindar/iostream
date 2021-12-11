@@ -31,6 +31,12 @@ func TestStreamReadShortBuffer(t *testing.T) {
 	}
 }
 
+func TestReaderImpl(t *testing.T) {
+	r := NewReader(bytes.NewBuffer(nil))
+	_, err := r.Read([]byte{})
+	assert.Error(t, err)
+}
+
 // assertRead asserts a single read operation
 func assertRead(t *testing.T, name string, fn func(*Reader) (interface{}, error), input []byte, expect interface{}) {
 	assertReadN(t, name, fn, input, expect, 99999)

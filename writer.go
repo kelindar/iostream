@@ -28,8 +28,16 @@ func (w *Writer) Reset(out io.Writer) {
 	w.out = out
 }
 
+// --------------------------- io.Writer ---------------------------
+
+// Write implements io.Writer interface by simply writing into the underlying
+// souurce.
+func (w *Writer) Write(p []byte) (int, error) {
+	return w.out.Write(p)
+}
+
 // Write writes the contents of p into the buffer.
-func (w *Writer) Write(p []byte) (err error) {
+func (w *Writer) write(p []byte) (err error) {
 	_, err = w.out.Write(p)
 	return
 }
@@ -45,7 +53,7 @@ func (w *Writer) WriteUvarint(x uint64) error {
 		i++
 	}
 	w.scratch[i] = byte(x)
-	return w.Write(w.scratch[:(i + 1)])
+	return w.write(w.scratch[:(i + 1)])
 }
 
 // WriteUint writes a Uint
@@ -55,15 +63,15 @@ func (w *Writer) WriteUint(v uint) error {
 
 // WriteUint8 writes a Uint8
 func (w *Writer) WriteUint8(v uint8) error {
-	w.scratch[0] = byte(v)
-	return w.Write(w.scratch[:1])
+	w.scratch[0] = v
+	return w.write(w.scratch[:1])
 }
 
 // WriteUint16 writes a Uint16
 func (w *Writer) WriteUint16(v uint16) error {
 	w.scratch[0] = byte(v)
 	w.scratch[1] = byte(v >> 8)
-	return w.Write(w.scratch[:2])
+	return w.write(w.scratch[:2])
 }
 
 // WriteUint32 writes a Uint32
@@ -72,7 +80,7 @@ func (w *Writer) WriteUint32(v uint32) error {
 	w.scratch[1] = byte(v >> 8)
 	w.scratch[2] = byte(v >> 16)
 	w.scratch[3] = byte(v >> 24)
-	return w.Write(w.scratch[:4])
+	return w.write(w.scratch[:4])
 }
 
 // WriteUint64 writes a Uint64
@@ -85,7 +93,7 @@ func (w *Writer) WriteUint64(v uint64) error {
 	w.scratch[5] = byte(v >> 40)
 	w.scratch[6] = byte(v >> 48)
 	w.scratch[7] = byte(v >> 56)
-	return w.Write(w.scratch[:8])
+	return w.write(w.scratch[:8])
 }
 
 // --------------------------- Signed Integers ---------------------------
@@ -104,11 +112,11 @@ func (w *Writer) WriteVarint(v int64) error {
 		i++
 	}
 	w.scratch[i] = byte(x)
-	return w.Write(w.scratch[:(i + 1)])
+	return w.write(w.scratch[:(i + 1)])
 }
 
-// WriteUint writes an int
-func (w *Writer) WriteInt(v uint) error {
+// WriteInt writes an int
+func (w *Writer) WriteInt(v int) error {
 	return w.WriteUint64(uint64(v))
 }
 
@@ -118,17 +126,17 @@ func (w *Writer) WriteInt8(v int8) error {
 }
 
 // WriteInt16 writes an int16
-func (w *Writer) WriteInt16(v uint16) error {
+func (w *Writer) WriteInt16(v int16) error {
 	return w.WriteUint16(uint16(v))
 }
 
 // WriteInt32 writes an int32
-func (w *Writer) WriteInt32(v uint32) error {
+func (w *Writer) WriteInt32(v int32) error {
 	return w.WriteUint32(uint32(v))
 }
 
 // WriteInt64 writes an int64
-func (w *Writer) WriteInt64(v uint64) error {
+func (w *Writer) WriteInt64(v int64) error {
 	return w.WriteUint64(uint64(v))
 }
 
@@ -173,7 +181,7 @@ func (w *Writer) WriteString(v string) error {
 	if err := w.WriteUvarint(uint64(len(v))); err != nil {
 		return err
 	}
-	return w.Write(toBytes(v))
+	return w.write(toBytes(v))
 }
 
 // WriteBytes writes a byte slice prefixed with a variable-size integer.
@@ -181,7 +189,7 @@ func (w *Writer) WriteBytes(v []byte) error {
 	if err := w.WriteUvarint(uint64(len(v))); err != nil {
 		return err
 	}
-	return w.Write(v)
+	return w.write(v)
 }
 
 // --------------------------- Other Types ---------------------------
@@ -192,7 +200,7 @@ func (w *Writer) WriteBool(v bool) error {
 	if v {
 		w.scratch[0] = 1
 	}
-	return w.Write(w.scratch[:1])
+	return w.write(w.scratch[:1])
 }
 
 // WriteComplex64 a 64-bit complex number

@@ -23,6 +23,14 @@ func NewReader(r io.Reader) *Reader {
 	}
 }
 
+// --------------------------- io.Reader ---------------------------
+
+// Read implements io.Reader interface by simply calling the Read method on
+// the underlying stream.
+func (r *Reader) Read(p []byte) (n int, err error) {
+	return r.src.Read(p)
+}
+
 // --------------------------- Unsigned Integers ---------------------------
 
 // ReadUvarint reads a variable-length Uint64 from the buffer.
