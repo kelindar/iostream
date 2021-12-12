@@ -112,3 +112,26 @@ func (w *limitWriter) Write(p []byte) (int, error) {
 
 	return w.buffer.Write(p)
 }
+
+func (w *limitWriter) Close() error {
+	return nil
+}
+
+// --------------------------- Self Reader/Writer ---------------------------
+
+type person struct {
+	Name string
+}
+
+func (p *person) WriteTo(dst io.Writer) (int64, error) {
+	w := NewWriter(dst)
+	err := w.WriteString(p.Name)
+	return w.Offset(), err
+}
+
+func (p *person) ReadFrom(src io.Reader) (int64, error) {
+	r := NewReader(src)
+	name, err := r.ReadString()
+	p.Name = name
+	return r.Offset(), err
+}

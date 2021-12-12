@@ -27,7 +27,7 @@ func NewReader(src io.Reader) *Reader {
 }
 
 // Offset returns the number of bytes read through this reader.
-func (r *Reader) Offset() uint {
+func (r *Reader) Offset() int64 {
 	return r.src.Offset()
 }
 
@@ -180,6 +180,13 @@ func (r *Reader) ReadText(v encoding.TextUnmarshaler) error {
 	}
 
 	return v.UnmarshalText(b)
+}
+
+// ReadSelf uses the provider io.ReaderFrom in order to read the data from
+// the source reader.
+func (r *Reader) ReadSelf(v io.ReaderFrom) error {
+	_, err := v.ReadFrom(r)
+	return err
 }
 
 // --------------------------- Strings ---------------------------

@@ -27,7 +27,7 @@ type source interface {
 	Slice(n int) (buffer []byte, err error)
 	ReadUvarint() (uint64, error)
 	ReadVarint() (int64, error)
-	Offset() uint
+	Offset() int64
 }
 
 // newSource figures out the most efficient source to use for the provided type
@@ -53,7 +53,7 @@ func newSource(r io.Reader) source {
 // sliceSource implements a source that only reads from a slice
 type sliceSource struct {
 	buffer []byte
-	offset uint64 // current reading index
+	offset int64
 }
 
 // newSliceSource returns a new source reading from b.
@@ -62,24 +62,24 @@ func newSliceSource(b []byte) *sliceSource {
 }
 
 // Offset returns the number of bytes read through this reader.
-func (r *sliceSource) Offset() uint {
-	return uint(r.offset)
+func (r *sliceSource) Offset() int64 {
+	return r.offset
 }
 
 // Read implements the io.Reader interface.
 func (r *sliceSource) Read(b []byte) (n int, err error) {
-	if r.offset >= uint64(len(r.buffer)) {
+	if r.offset >= int64(len(r.buffer)) {
 		return 0, io.EOF
 	}
 
 	n = copy(b, r.buffer[r.offset:])
-	r.offset += uint64(n)
+	r.offset += int64(n)
 	return
 }
 
 // ReadByte implements the io.ByteReader interface.
 func (r *sliceSource) ReadByte() (byte, error) {
-	if r.offset >= uint64(len(r.buffer)) {
+	if r.offset >= int64(len(r.buffer)) {
 		return 0, io.EOF
 	}
 
@@ -93,12 +93,12 @@ func (r *sliceSource) ReadByte() (byte, error) {
 // returns a sub-slice pointing to the same array. Since this requires access
 // to the underlying data, this is only available for our default source.
 func (r *sliceSource) Slice(n int) ([]byte, error) {
-	if r.offset+uint64(n) > uint64(len(r.buffer)) {
+	if r.offset+int64(n) > int64(len(r.buffer)) {
 		return nil, io.EOF
 	}
 
 	cur := r.offset
-	r.offset += uint64(n)
+	r.offset += int64(n)
 	return r.buffer[cur:r.offset], nil
 }
 
@@ -106,7 +106,7 @@ func (r *sliceSource) Slice(n int) ([]byte, error) {
 func (r *sliceSource) ReadUvarint() (uint64, error) {
 	var x uint64
 	for s := 0; s < maxVarintLen64; s += 7 {
-		if r.offset >= uint64(len(r.buffer)) {
+		if r.offset >= int64(len(r.buffer)) {
 			return 0, io.EOF
 		}
 
@@ -140,7 +140,7 @@ type streamSource struct {
 	io.Reader
 	io.ByteReader
 	scratch []byte
-	offset  uint64
+	offset  int64
 }
 
 // newStreamSource returns a new stream source
@@ -163,14 +163,14 @@ func newStreamSource(r io.Reader) *streamSource {
 }
 
 // Offset returns the number of bytes read through this reader.
-func (r *streamSource) Offset() uint {
-	return uint(r.offset)
+func (r *streamSource) Offset() int64 {
+	return r.offset
 }
 
 // Read implements the io.Reader interface.
 func (r *streamSource) Read(b []byte) (int, error) {
 	n, err := r.Reader.Read(b)
-	r.offset += uint64(n)
+	r.offset += int64(n)
 	return n, err
 }
 
@@ -189,7 +189,7 @@ func (r *streamSource) Slice(n int) ([]byte, error) {
 
 	// Read from the stream into our scratch buffer
 	n, err := io.ReadAtLeast(r.Reader, r.scratch[:n], n)
-	r.offset += uint64(n)
+	r.offset += int64(n)
 	return r.scratch[:n], err
 }
 

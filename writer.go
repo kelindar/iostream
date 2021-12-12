@@ -13,7 +13,7 @@ import (
 type Writer struct {
 	scratch [10]byte
 	out     io.Writer
-	offset  uint64
+	offset  int64
 }
 
 // NewWriter creates a new stream writer.
@@ -34,8 +34,8 @@ func (w *Writer) Reset(out io.Writer) {
 }
 
 // Offset returns the number of bytes written through this writer.
-func (w *Writer) Offset() uint {
-	return uint(w.offset)
+func (w *Writer) Offset() int64 {
+	return w.offset
 }
 
 // --------------------------- io.Writer ---------------------------
@@ -44,15 +44,24 @@ func (w *Writer) Offset() uint {
 // souurce.
 func (w *Writer) Write(p []byte) (int, error) {
 	n, err := w.out.Write(p)
-	w.offset += uint64(n)
+	w.offset += int64(n)
 	return n, err
 }
 
 // Write writes the contents of p into the buffer.
 func (w *Writer) write(p []byte) error {
 	n, err := w.out.Write(p)
-	w.offset += uint64(n)
+	w.offset += int64(n)
 	return err
+}
+
+// Close closes the writer's underlying stream and return its error. If the
+// underlying stream is not an io.Closer, it is a no-op.
+func (w *Writer) Close() error {
+	if closer, ok := w.out.(io.Closer); ok {
+		return closer.Close()
+	}
+	return nil
 }
 
 // --------------------------- Unsigned Integers ---------------------------
@@ -184,6 +193,13 @@ func (w *Writer) WriteText(v encoding.TextMarshaler) error {
 	if err == nil {
 		err = w.WriteBytes(out)
 	}
+	return err
+}
+
+// WriteSelf uses the provider io.WriterTo in order to write the data into
+// the destination writer.
+func (w *Writer) WriteSelf(v io.WriterTo) error {
+	_, err := v.WriteTo(w)
 	return err
 }
 
