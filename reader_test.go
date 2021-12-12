@@ -37,6 +37,12 @@ func TestReaderImpl(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestNewReader(t *testing.T) {
+	r1 := NewReader(bytes.NewBuffer(nil))
+	r2 := NewReader(r1)
+	assert.Equal(t, r1, r2)
+}
+
 // assertRead asserts a single read operation
 func assertRead(t *testing.T, name string, fn func(*Reader) (interface{}, error), input []byte, expect interface{}) {
 	assertReadN(t, name, fn, input, expect, 99999)
@@ -63,6 +69,7 @@ func assertReadN(t *testing.T, name string, fn func(*Reader) (interface{}, error
 		// Successfully encoded, check the output
 		assert.NoError(t, err, msg)
 		assert.Equal(t, expect, out, msg)
+		assert.Equal(t, len(input), int(rdr.Offset()))
 	})
 }
 
@@ -83,5 +90,6 @@ func assertSliceRead(t *testing.T, name string, fn func(*Reader) (interface{}, e
 		// Successfully encoded, check the output
 		assert.NoError(t, err, msg)
 		assert.Equal(t, expect, out, msg)
+		assert.Equal(t, len(input), int(rdr.Offset()))
 	})
 }
