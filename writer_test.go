@@ -146,6 +146,18 @@ var Fixtures = map[string]struct {
 		Buffer: []byte{0x14, 0x31, 0x39, 0x37, 0x30, 0x2d, 0x30, 0x31, 0x2d, 0x30, 0x31, 0x54, 0x30, 0x30, 0x3a, 0x30, 0x31, 0x3a, 0x30, 0x30, 0x5a},
 		Value:  time.Unix(60, 0).UTC(),
 	},
+	"person": {
+		Encode: func(w *Writer) error {
+			return w.WriteSelf(&person{Name: "Roman"})
+		},
+		Decode: func(r *Reader) (interface{}, error) {
+			var out person
+			err := r.ReadSelf(&out)
+			return out, err
+		},
+		Buffer: []byte{0x5, 0x52, 0x6f, 0x6d, 0x61, 0x6e},
+		Value:  person{Name: "Roman"},
+	},
 }
 
 func TestWrite(t *testing.T) {
@@ -174,6 +186,12 @@ func TestNewWriter(t *testing.T) {
 	w1 := NewWriter(bytes.NewBuffer(nil))
 	w2 := NewWriter(w1)
 	assert.Equal(t, w1, w2)
+	assert.NoError(t, w1.Close())
+}
+
+func TestWriterClose(t *testing.T) {
+	w := NewWriter(new(limitWriter))
+	assert.NoError(t, w.Close())
 }
 
 // assertWrite asserts a single write operation
