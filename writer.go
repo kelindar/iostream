@@ -5,7 +5,6 @@ package iostream
 
 import (
 	"encoding"
-	"encoding/binary"
 	"io"
 	"math"
 )
@@ -14,10 +13,15 @@ import (
 type Writer struct {
 	scratch [10]byte
 	out     io.Writer
+	offset  uint64
 }
 
 // NewWriter creates a new stream writer.
 func NewWriter(out io.Writer) *Writer {
+	if w, ok := out.(*Writer); ok {
+		return w
+	}
+
 	return &Writer{
 		out: out,
 	}
@@ -26,6 +30,12 @@ func NewWriter(out io.Writer) *Writer {
 // Reset resets the writer and makes it ready to be reused.
 func (w *Writer) Reset(out io.Writer) {
 	w.out = out
+	w.offset = 0
+}
+
+// Offset returns the number of bytes written through this writer.
+func (w *Writer) Offset() uint {
+	return uint(w.offset)
 }
 
 // --------------------------- io.Writer ---------------------------
@@ -33,13 +43,16 @@ func (w *Writer) Reset(out io.Writer) {
 // Write implements io.Writer interface by simply writing into the underlying
 // souurce.
 func (w *Writer) Write(p []byte) (int, error) {
-	return w.out.Write(p)
+	n, err := w.out.Write(p)
+	w.offset += uint64(n)
+	return n, err
 }
 
 // Write writes the contents of p into the buffer.
-func (w *Writer) write(p []byte) (err error) {
-	_, err = w.out.Write(p)
-	return
+func (w *Writer) write(p []byte) error {
+	n, err := w.out.Write(p)
+	w.offset += uint64(n)
+	return err
 }
 
 // --------------------------- Unsigned Integers ---------------------------
@@ -201,14 +214,4 @@ func (w *Writer) WriteBool(v bool) error {
 		w.scratch[0] = 1
 	}
 	return w.write(w.scratch[:1])
-}
-
-// WriteComplex64 a 64-bit complex number
-func (w *Writer) WriteComplex64(v complex64) error {
-	return binary.Write(w.out, binary.LittleEndian, v)
-}
-
-// WriteComplex128 a 128-bit complex number
-func (w *Writer) WriteComplex128(v complex128) error {
-	return binary.Write(w.out, binary.LittleEndian, v)
 }

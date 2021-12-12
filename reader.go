@@ -5,7 +5,6 @@ package iostream
 
 import (
 	"encoding"
-	"encoding/binary"
 	"io"
 	"math"
 )
@@ -17,10 +16,19 @@ type Reader struct {
 }
 
 // NewReader creates a stream reader.
-func NewReader(r io.Reader) *Reader {
-	return &Reader{
-		src: newSource(r),
+func NewReader(src io.Reader) *Reader {
+	if r, ok := src.(*Reader); ok {
+		return r
 	}
+
+	return &Reader{
+		src: newSource(src),
+	}
+}
+
+// Offset returns the number of bytes read through this reader.
+func (r *Reader) Offset() uint {
+	return r.src.Offset()
 }
 
 // --------------------------- io.Reader ---------------------------
@@ -204,16 +212,4 @@ func (r *Reader) ReadBytes() (out []byte, err error) {
 func (r *Reader) ReadBool() (bool, error) {
 	b, err := r.src.ReadByte()
 	return b == 1, err
-}
-
-// ReadComplex64 reads a complex64
-func (r *Reader) ReadComplex64() (out complex64, err error) {
-	err = binary.Read(r.src, binary.LittleEndian, &out)
-	return
-}
-
-// ReadComplex128 reads a complex128
-func (r *Reader) ReadComplex128() (out complex128, err error) {
-	err = binary.Read(r.src, binary.LittleEndian, &out)
-	return
 }

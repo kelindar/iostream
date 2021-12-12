@@ -126,18 +126,6 @@ var Fixtures = map[string]struct {
 		Buffer: []byte{0x1},
 		Value:  true,
 	},
-	"complex64": {
-		Encode: func(w *Writer) error { return w.WriteComplex64(complex64(1)) },
-		Decode: func(r *Reader) (interface{}, error) { return r.ReadComplex64() },
-		Buffer: []byte{0x0, 0x0, 0x80, 0x3f, 0x0, 0x0, 0x0, 0x0},
-		Value:  complex64(1),
-	},
-	"complex128": {
-		Encode: func(w *Writer) error { return w.WriteComplex128(complex128(1)) },
-		Decode: func(r *Reader) (interface{}, error) { return r.ReadComplex128() },
-		Buffer: []byte{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xf0, 0x3f, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
-		Value:  complex128(1),
-	},
 	"time-binary": {
 		Encode: func(w *Writer) error { return w.WriteBinary(time.Unix(60, 0).UTC()) },
 		Decode: func(r *Reader) (interface{}, error) {
@@ -182,6 +170,12 @@ func TestWriteMethod(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestNewWriter(t *testing.T) {
+	w1 := NewWriter(bytes.NewBuffer(nil))
+	w2 := NewWriter(w1)
+	assert.Equal(t, w1, w2)
+}
+
 // assertWrite asserts a single write operation
 func assertWrite(t *testing.T, name string, fn func(*Writer) error, expect []byte) {
 	assertWriteN(t, name, fn, expect, 99999)
@@ -206,5 +200,6 @@ func assertWriteN(t *testing.T, name string, fn func(*Writer) error, expect []by
 		// Successfully encoded, check the output
 		assert.NoError(t, err, msg)
 		assert.Equal(t, expect, dst.buffer.Bytes(), msg)
+		assert.Equal(t, len(expect), int(wrt.Offset()))
 	})
 }
