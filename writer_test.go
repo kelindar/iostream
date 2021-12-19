@@ -158,6 +158,29 @@ var Fixtures = map[string]struct {
 		Buffer: []byte{0x5, 0x52, 0x6f, 0x6d, 0x61, 0x6e},
 		Value:  person{Name: "Roman"},
 	},
+	"range": {
+		Encode: func(w *Writer) error {
+			v := []person{{Name: "Roman"}, {Name: "Florimond"}}
+			return w.WriteRange(len(v), func(i int, w *Writer) error {
+				return w.WriteSelf(&v[i])
+			})
+		},
+		Decode: func(r *Reader) (interface{}, error) {
+			var arr []person
+			err := r.ReadRange(func(i int, r *Reader) error {
+				var out person
+				if err := r.ReadSelf(&out); err != nil {
+					return err
+				}
+
+				arr = append(arr, out)
+				return nil
+			})
+			return arr, err
+		},
+		Buffer: []byte{0x2, 0x5, 0x52, 0x6f, 0x6d, 0x61, 0x6e, 0x9, 0x46, 0x6c, 0x6f, 0x72, 0x69, 0x6d, 0x6f, 0x6e, 0x64},
+		Value:  []person{{Name: "Roman"}, {Name: "Florimond"}},
+	},
 }
 
 func TestWrite(t *testing.T) {
@@ -174,6 +197,14 @@ func TestWriteFailuresString(t *testing.T) {
 	assertWriteN(t, "bytes-err", func(w *Writer) error {
 		return w.WriteBytes([]byte("hello"))
 	}, nil, 0)
+}
+
+func TestWriteFailures(t *testing.T) {
+	for n, tc := range Fixtures {
+		for x := 0; x < int(len(tc.Buffer))-1; x++ {
+			assertWriteN(t, n, tc.Encode, nil, x)
+		}
+	}
 }
 
 func TestWriteMethod(t *testing.T) {

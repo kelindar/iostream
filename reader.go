@@ -215,6 +215,22 @@ func (r *Reader) ReadBytes() (out []byte, err error) {
 
 // --------------------------- Other Types ---------------------------
 
+// ReadRange reads the length of the array from the underlying stream and
+// calls a callback function on each element of that array.
+func (r *Reader) ReadRange(fn func(i int, r *Reader) error) error {
+	length, err := r.ReadUvarint()
+	if err != nil {
+		return err
+	}
+
+	for i := 0; i < int(length); i++ {
+		if err := fn(i, r); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // ReadBool reads a single boolean value from the slice.
 func (r *Reader) ReadBool() (bool, error) {
 	b, err := r.src.ReadByte()
