@@ -223,6 +223,22 @@ func (w *Writer) WriteBytes(v []byte) error {
 
 // --------------------------- Other Types ---------------------------
 
+// WriteRange writes a specified length of an array and for each element of that
+// array calls the callback function with its index.
+func (w *Writer) WriteRange(length int, fn func(i int, w *Writer) error) error {
+	if err := w.WriteUvarint(uint64(length)); err != nil {
+		return err
+	}
+
+	for i := 0; i < length; i++ {
+		if err := fn(i, w); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // WriteBool writes a single boolean value into the buffer
 func (w *Writer) WriteBool(v bool) error {
 	w.scratch[0] = 0
