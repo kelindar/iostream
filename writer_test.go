@@ -225,6 +225,11 @@ func TestWriterClose(t *testing.T) {
 	assert.NoError(t, w.Close())
 }
 
+func TestWriterFlush(t *testing.T) {
+	assert.NoError(t, NewWriter(new(limitWriter)).Flush())
+	assert.NoError(t, NewWriter(bytes.NewBuffer(nil)).Flush())
+}
+
 // assertWrite asserts a single write operation
 func assertWrite(t *testing.T, name string, fn func(*Writer) error, expect []byte) {
 	assertWriteN(t, name, fn, expect, 99999)

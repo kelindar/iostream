@@ -117,6 +117,10 @@ func (w *limitWriter) Close() error {
 	return nil
 }
 
+func (w *limitWriter) Flush() error {
+	return nil
+}
+
 // --------------------------- Self Reader/Writer ---------------------------
 
 type person struct {
