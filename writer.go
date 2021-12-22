@@ -55,8 +55,19 @@ func (w *Writer) write(p []byte) error {
 	return err
 }
 
+// Flush flushes the writer to the underlying stream and returns its error. If
+// the underlying io.Writer does not have a Flush() error method, it's a no-op.
+func (w *Writer) Flush() error {
+	if flusher, ok := w.out.(interface {
+		Flush() error
+	}); ok {
+		return flusher.Flush()
+	}
+	return nil
+}
+
 // Close closes the writer's underlying stream and return its error. If the
-// underlying stream is not an io.Closer, it is a no-op.
+// underlying io.Writer is not an io.Closer, it's a no-op.
 func (w *Writer) Close() error {
 	if closer, ok := w.out.(io.Closer); ok {
 		return closer.Close()
