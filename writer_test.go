@@ -181,6 +181,84 @@ var Fixtures = map[string]struct {
 		Buffer: []byte{0x2, 0x5, 0x52, 0x6f, 0x6d, 0x61, 0x6e, 0x9, 0x46, 0x6c, 0x6f, 0x72, 0x69, 0x6d, 0x6f, 0x6e, 0x64},
 		Value:  []person{{Name: "Roman"}, {Name: "Florimond"}},
 	},
+	"float32s": {
+		Encode: func(w *Writer) error { return w.WriteFloat32s([]float32{0x11}) },
+		Decode: func(r *Reader) (interface{}, error) { return r.ReadFloat32s() },
+		Buffer: []byte{0x1, 0x0, 0x0, 0x88, 0x41},
+		Value:  []float32{0x11},
+	},
+	"float64s": {
+		Encode: func(w *Writer) error { return w.WriteFloat64s([]float64{0x11}) },
+		Decode: func(r *Reader) (interface{}, error) { return r.ReadFloat64s() },
+		Buffer: []byte{0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x31, 0x40},
+		Value:  []float64{0x11},
+	},
+	"uint8s": {
+		Encode: func(w *Writer) error { return w.WriteUint8s([]uint8{0x11}) },
+		Decode: func(r *Reader) (interface{}, error) { return r.ReadUint8s() },
+		Buffer: []byte{0x1, 0x11},
+		Value:  []uint8{0x11},
+	},
+	"uint16s": {
+		Encode: func(w *Writer) error { return w.WriteUint16s([]uint16{0x11}) },
+		Decode: func(r *Reader) (interface{}, error) { return r.ReadUint16s() },
+		Buffer: []byte{0x1, 0x11, 0x0},
+		Value:  []uint16{0x11},
+	},
+	"uint32s": {
+		Encode: func(w *Writer) error { return w.WriteUint32s([]uint32{0x11}) },
+		Decode: func(r *Reader) (interface{}, error) { return r.ReadUint32s() },
+		Buffer: []byte{0x1, 0x11, 0x0, 0x0, 0x0},
+		Value:  []uint32{0x11},
+	},
+	"uint64s": {
+		Encode: func(w *Writer) error { return w.WriteUint64s([]uint64{0x11}) },
+		Decode: func(r *Reader) (interface{}, error) { return r.ReadUint64s() },
+		Buffer: []byte{0x1, 0x11, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+		Value:  []uint64{0x11},
+	},
+	"uints": {
+		Encode: func(w *Writer) error { return w.WriteUints([]uint{0x11}) },
+		Decode: func(r *Reader) (interface{}, error) { return r.ReadUints() },
+		Buffer: []byte{0x1, 0x11, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+		Value:  []uint{0x11},
+	},
+	"int8s": {
+		Encode: func(w *Writer) error { return w.WriteInt8s([]int8{0x11}) },
+		Decode: func(r *Reader) (interface{}, error) { return r.ReadInt8s() },
+		Buffer: []byte{0x1, 0x11},
+		Value:  []int8{0x11},
+	},
+	"int16s": {
+		Encode: func(w *Writer) error { return w.WriteInt16s([]int16{0x11}) },
+		Decode: func(r *Reader) (interface{}, error) { return r.ReadInt16s() },
+		Buffer: []byte{0x1, 0x11, 0x0},
+		Value:  []int16{0x11},
+	},
+	"int32s": {
+		Encode: func(w *Writer) error { return w.WriteInt32s([]int32{0x11}) },
+		Decode: func(r *Reader) (interface{}, error) { return r.ReadInt32s() },
+		Buffer: []byte{0x1, 0x11, 0x0, 0x0, 0x0},
+		Value:  []int32{0x11},
+	},
+	"int64s": {
+		Encode: func(w *Writer) error { return w.WriteInt64s([]int64{0x11}) },
+		Decode: func(r *Reader) (interface{}, error) { return r.ReadInt64s() },
+		Buffer: []byte{0x1, 0x11, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+		Value:  []int64{0x11},
+	},
+	"ints": {
+		Encode: func(w *Writer) error { return w.WriteInts([]int{0x11}) },
+		Decode: func(r *Reader) (interface{}, error) { return r.ReadInts() },
+		Buffer: []byte{0x1, 0x11, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+		Value:  []int{0x11},
+	},
+	"strings": {
+		Encode: func(w *Writer) error { return w.WriteStrings([]string{"hello"}) },
+		Decode: func(r *Reader) (interface{}, error) { return r.ReadStrings() },
+		Buffer: []byte{0x1, 0x5, 0x68, 0x65, 0x6c, 0x6c, 0x6f},
+		Value:  []string{"hello"},
+	},
 }
 
 func TestWrite(t *testing.T) {
