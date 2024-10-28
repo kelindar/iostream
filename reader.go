@@ -89,6 +89,91 @@ func (r *Reader) ReadUint() (uint, error) {
 	return uint(out), err
 }
 
+// ReadUint8s reads an array of uint8s
+func (r *Reader) ReadUint8s() ([]uint8, error) {
+	length, err := r.ReadUvarint()
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]uint8, length)
+	for i := 0; i < int(length); i++ {
+		if out[i], err = r.ReadUint8(); err != nil {
+			return nil, err
+		}
+	}
+
+	return out, nil
+}
+
+// ReadUint16s reads an array of uint16s
+func (r *Reader) ReadUint16s() ([]uint16, error) {
+	length, err := r.ReadUvarint()
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]uint16, length)
+	for i := 0; i < int(length); i++ {
+		if out[i], err = r.ReadUint16(); err != nil {
+			return nil, err
+		}
+	}
+
+	return out, nil
+}
+
+// ReadUint32s reads an array of uint32s
+func (r *Reader) ReadUint32s() ([]uint32, error) {
+	length, err := r.ReadUvarint()
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]uint32, length)
+	for i := 0; i < int(length); i++ {
+		if out[i], err = r.ReadUint32(); err != nil {
+			return nil, err
+		}
+	}
+
+	return out, nil
+}
+
+// ReadUint64s reads an array of uint64s
+func (r *Reader) ReadUint64s() ([]uint64, error) {
+	length, err := r.ReadUvarint()
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]uint64, length)
+	for i := 0; i < int(length); i++ {
+		if out[i], err = r.ReadUint64(); err != nil {
+			return nil, err
+		}
+	}
+
+	return out, nil
+}
+
+// ReadUints reads an array of uints
+func (r *Reader) ReadUints() ([]uint, error) {
+	length, err := r.ReadUvarint()
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]uint, length)
+	for i := 0; i < int(length); i++ {
+		if out[i], err = r.ReadUint(); err != nil {
+			return nil, err
+		}
+	}
+
+	return out, nil
+}
+
 // --------------------------- Signed Integers ---------------------------
 
 // ReadVarint reads a variable-length Int64 from the buffer.
@@ -126,6 +211,91 @@ func (r *Reader) ReadInt() (int, error) {
 	return int(out), err
 }
 
+// ReadInt8s reads an array of int8s
+func (r *Reader) ReadInt8s() ([]int8, error) {
+	length, err := r.ReadUvarint()
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]int8, length)
+	for i := 0; i < int(length); i++ {
+		if out[i], err = r.ReadInt8(); err != nil {
+			return nil, err
+		}
+	}
+
+	return out, nil
+}
+
+// ReadInt16s reads an array of int16s
+func (r *Reader) ReadInt16s() ([]int16, error) {
+	length, err := r.ReadUvarint()
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]int16, length)
+	for i := 0; i < int(length); i++ {
+		if out[i], err = r.ReadInt16(); err != nil {
+			return nil, err
+		}
+	}
+
+	return out, nil
+}
+
+// ReadInt32s reads an array of int32s
+func (r *Reader) ReadInt32s() ([]int32, error) {
+	length, err := r.ReadUvarint()
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]int32, length)
+	for i := 0; i < int(length); i++ {
+		if out[i], err = r.ReadInt32(); err != nil {
+			return nil, err
+		}
+	}
+
+	return out, nil
+}
+
+// ReadInt64s reads an array of int64s
+func (r *Reader) ReadInt64s() ([]int64, error) {
+	length, err := r.ReadUvarint()
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]int64, length)
+	for i := 0; i < int(length); i++ {
+		if out[i], err = r.ReadInt64(); err != nil {
+			return nil, err
+		}
+	}
+
+	return out, nil
+}
+
+// ReadUints reads an array of uints
+func (r *Reader) ReadInts() ([]int, error) {
+	length, err := r.ReadUvarint()
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]int, length)
+	for i := 0; i < int(length); i++ {
+		if out[i], err = r.ReadInt(); err != nil {
+			return nil, err
+		}
+	}
+
+	return out, nil
+}
+
 // --------------------------- Floats ---------------------------
 
 // ReadFloat32 reads a float32
@@ -144,6 +314,40 @@ func (r *Reader) ReadFloat64() (out float64, err error) {
 		out = math.Float64frombits(v)
 	}
 	return
+}
+
+// ReadFloat32s reads an array of float32s
+func (r *Reader) ReadFloat32s() ([]float32, error) {
+	length, err := r.ReadUvarint()
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]float32, length)
+	for i := 0; i < int(length); i++ {
+		if out[i], err = r.ReadFloat32(); err != nil {
+			return nil, err
+		}
+	}
+
+	return out, nil
+}
+
+// ReadFloat64s reads an array of float64s
+func (r *Reader) ReadFloat64s() ([]float64, error) {
+	length, err := r.ReadUvarint()
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]float64, length)
+	for i := 0; i < int(length); i++ {
+		if out[i], err = r.ReadFloat64(); err != nil {
+			return nil, err
+		}
+	}
+
+	return out, nil
 }
 
 // --------------------------- Marshaled Types ---------------------------
@@ -211,6 +415,23 @@ func (r *Reader) ReadBytes() (out []byte, err error) {
 	out = make([]byte, int(size))
 	_, err = io.ReadAtLeast(r.src, out, int(size))
 	return
+}
+
+// ReadStrings reads an array of strings
+func (r *Reader) ReadStrings() ([]string, error) {
+	length, err := r.ReadUvarint()
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]string, length)
+	for i := 0; i < int(length); i++ {
+		if out[i], err = r.ReadString(); err != nil {
+			return nil, err
+		}
+	}
+
+	return out, nil
 }
 
 // --------------------------- Other Types ---------------------------

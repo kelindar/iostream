@@ -129,6 +129,41 @@ func (w *Writer) WriteUint64(v uint64) error {
 	return w.write(w.scratch[:8])
 }
 
+// WriteUint8s writes an array of uint8s
+func (w *Writer) WriteUint8s(v []uint8) error {
+	return w.WriteRange(len(v), func(i int, w *Writer) error {
+		return w.WriteUint8(v[i])
+	})
+}
+
+// WriteUint16s writes an array of uint16s
+func (w *Writer) WriteUint16s(v []uint16) error {
+	return w.WriteRange(len(v), func(i int, w *Writer) error {
+		return w.WriteUint16(v[i])
+	})
+}
+
+// WriteUint32s writes an array of uint32s
+func (w *Writer) WriteUint32s(v []uint32) error {
+	return w.WriteRange(len(v), func(i int, w *Writer) error {
+		return w.WriteUint32(v[i])
+	})
+}
+
+// WriteUint64s writes an array of uint64s
+func (w *Writer) WriteUint64s(v []uint64) error {
+	return w.WriteRange(len(v), func(i int, w *Writer) error {
+		return w.WriteUint64(v[i])
+	})
+}
+
+// WriteUints writes an array of uints
+func (w *Writer) WriteUints(v []uint) error {
+	return w.WriteRange(len(v), func(i int, w *Writer) error {
+		return w.WriteUint(v[i])
+	})
+}
+
 // --------------------------- Signed Integers ---------------------------
 
 // WriteVarint writes a variable size signed integer
@@ -173,6 +208,41 @@ func (w *Writer) WriteInt64(v int64) error {
 	return w.WriteUint64(uint64(v))
 }
 
+// WriteInt8s writes an array of int8s
+func (w *Writer) WriteInt8s(v []int8) error {
+	return w.WriteRange(len(v), func(i int, w *Writer) error {
+		return w.WriteInt8(v[i])
+	})
+}
+
+// WriteInt16s writes an array of int16s
+func (w *Writer) WriteInt16s(v []int16) error {
+	return w.WriteRange(len(v), func(i int, w *Writer) error {
+		return w.WriteInt16(v[i])
+	})
+}
+
+// WriteInt32s writes an array of int32s
+func (w *Writer) WriteInt32s(v []int32) error {
+	return w.WriteRange(len(v), func(i int, w *Writer) error {
+		return w.WriteInt32(v[i])
+	})
+}
+
+// WriteInt64s writes an array of int64s
+func (w *Writer) WriteInt64s(v []int64) error {
+	return w.WriteRange(len(v), func(i int, w *Writer) error {
+		return w.WriteInt64(v[i])
+	})
+}
+
+// WriteInts writes an array of ints
+func (w *Writer) WriteInts(v []int) error {
+	return w.WriteRange(len(v), func(i int, w *Writer) error {
+		return w.WriteInt(v[i])
+	})
+}
+
 // --------------------------- Floats ---------------------------
 
 // WriteFloat32 a 32-bit floating point number
@@ -183,6 +253,20 @@ func (w *Writer) WriteFloat32(v float32) error {
 // WriteFloat64 a 64-bit floating point number
 func (w *Writer) WriteFloat64(v float64) error {
 	return w.WriteUint64(math.Float64bits(v))
+}
+
+// WriteFloat32s writes an array of float32s
+func (w *Writer) WriteFloat32s(v []float32) error {
+	return w.WriteRange(len(v), func(i int, w *Writer) error {
+		return w.WriteFloat32(v[i])
+	})
+}
+
+// WriteFloat64s writes an array of float64s
+func (w *Writer) WriteFloat64s(v []float64) error {
+	return w.WriteRange(len(v), func(i int, w *Writer) error {
+		return w.WriteFloat64(v[i])
+	})
 }
 
 // --------------------------- Marshaled Types ---------------------------
@@ -230,6 +314,13 @@ func (w *Writer) WriteBytes(v []byte) error {
 		return err
 	}
 	return w.write(v)
+}
+
+// WriteStrings writes an array of strings
+func (w *Writer) WriteStrings(v []string) error {
+	return w.WriteRange(len(v), func(i int, w *Writer) error {
+		return w.WriteString(v[i])
+	})
 }
 
 // --------------------------- Other Types ---------------------------
